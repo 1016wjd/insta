@@ -1,14 +1,16 @@
 from django.shortcuts import render, redirect
 from .models import Post
-from .forms import PostForm
+from .forms import PostForm, CommentForm
 # Create your views here.
 
 
 def index(request):
     posts = Post.objects.all().order_by('-id')
+    comment_form = CommentForm()
 
     context = {
         'posts': posts,
+        'comment_form': comment_form,
     }
     return render(request, 'index.html', context)
 
@@ -31,3 +33,20 @@ def create(request):
     }
 
     return render(request, 'form.html', context)
+
+def comment_create(request, post_id):
+    comment_form = CommentForm(request.POST)
+
+    if comment_form.is_valid():
+        comment = comment_form.save(commit=False)
+        #현재 로그인 유저 넣기
+        comment.user = request.user
+        # post_id를 기준으로 찾은 post(객체 이용)
+        post = Post.objects.get(id=post_id)
+        comment.post = post
+        # 아이디 이용 가능
+        # comment.post_id = post_id
+
+        comment.save()
+        return redirect('posts:index')
+    
