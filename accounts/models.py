@@ -9,4 +9,5 @@ class User(AbstractUser):
         crop=['middle', 'center'],
         upload_to='profile',
     )
-# post_set = 
+# post_set =  >> 사용자가 올린 게시물들의 모임
+# like_posts =  >> 사용자가 누른 좋아요의 모임
