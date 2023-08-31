@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from .models import Post
 from .forms import PostForm, CommentForm
+from django.contrib.auth.decorators import login_required
 # Create your views here.
 
 
@@ -15,7 +16,7 @@ def index(request):
     return render(request, 'index.html', context)
 
 
-
+@login_required # 로그인을 하지 않으면 실행하지 못함!
 def create(request):
     if  request.method == 'POST':
         form = PostForm(request.POST, request.FILES)
@@ -34,12 +35,15 @@ def create(request):
 
     return render(request, 'form.html', context)
 
+#댓글저장
+@login_required
 def comment_create(request, post_id):
     comment_form = CommentForm(request.POST)
 
     if comment_form.is_valid():
         comment = comment_form.save(commit=False)
-        #현재 로그인 유저 넣기
+
+        #현재 로그인 유저 넣기 > 로그인을 하지 않으면 에러남!
         comment.user = request.user
         # post_id를 기준으로 찾은 post(객체 이용)
         post = Post.objects.get(id=post_id)
